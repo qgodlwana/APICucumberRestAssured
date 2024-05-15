@@ -2,7 +2,9 @@ package stepdefinitions;
 
 import io.cucumber.java.en.*;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.*;
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 
 import static org.junit.Assert.*;
@@ -12,6 +14,7 @@ public class Products {
     public RequestSpecification httpRequest;
     public Response response;
     public int ResponseCode;
+    public ResponseBody body;
     @Given("I hit the url of get products api endpoint")
     public void i_hit_the_url_of_get_products_api_endpoint(){
         RestAssured.baseURI = "https://fakestoreapi.com/";
@@ -38,5 +41,22 @@ public class Products {
         ResponseCode = response.getStatusCode();
         assertEquals(ResponseCode, 404);
         System.out.println("Response invalid Code is: "+ResponseCode);
+    }
+
+    @Then("I verify that the rate of the first product is {}")
+    public void i_verify_that_the_rate_of_the_first_product_is(String rate) {
+        //get the response body first
+        body = response.getBody();
+
+        //convert response body to string
+        String responseBody = body.asString();
+
+        //this is a json representation from response body
+        JsonPath path = response.jsonPath();
+
+        //looking for object "rating"
+        String s = path.getJsonObject("rating[0].rate").toString();
+
+        assertEquals(rate, s);
     }
 }
