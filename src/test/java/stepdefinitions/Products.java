@@ -6,6 +6,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.*;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
+import org.json.simple.JSONObject;
 
 import static org.junit.Assert.*;
 
@@ -15,6 +16,7 @@ public class Products {
     public Response response;
     public int ResponseCode;
     public ResponseBody body;
+    public JSONObject requestParams;
     @Given("I hit the url of get products api endpoint")
     public void i_hit_the_url_of_get_products_api_endpoint(){
         RestAssured.baseURI = "https://fakestoreapi.com/";
@@ -58,5 +60,37 @@ public class Products {
         String s = path.getJsonObject("rating[0].rate").toString();
 
         assertEquals(rate, s);
+    }
+    @Given("I hit the url of post product api endpoint")
+    public void i_hit_the_url_of_post_product_api_endpoint() {
+        RestAssured.baseURI = "https://fakestoreapi.com/";
+        httpRequest = RestAssured.given();
+        requestParams = new JSONObject();
+    }
+    @And("I pass the request body of product title {}")
+    public void iPassTheRequestBodyOfProductTitle(String title) {
+        requestParams.put("title",title);
+        requestParams.put("price", 15.5);
+        requestParams.put("description","sky blue all star");
+        requestParams.put("image","https://conlog.co.za");
+        requestParams.put("category","electronic");
+        httpRequest.body(requestParams.toJSONString());
+        Response response = httpRequest.post("products");
+        ResponseBody body = response.getBody();
+
+        System.out.println(response.getStatusLine());
+        System.out.println(body.asString());
+    }
+
+    @Then("I receive the response body with id as {}")
+    public void iReceiveTheResponseBodyWithIdAs(String id) {
+        JsonPath path = response.jsonPath();
+
+        //extract the id at index 19 from the JSON array
+        String s = path.getString("id[19]");
+
+        //check if extracted id matches the expected id
+        assertEquals("20", s);
+        System.out.println(s);
     }
 }
