@@ -93,4 +93,30 @@ public class Products {
         assertEquals("20", s);
         System.out.println(s);
     }
+
+    @Given("I hit the url of put product api endpoint")
+    public void iHitTheUrlOfPutProductApiEndpoint() {
+        RestAssured.baseURI = "https://fakestoreapi.com/";
+        requestParams = new JSONObject();
+    }
+
+    @When("I pass the url of products in the request with {}")
+    public void iPassTheUrlOfProductsInTheRequestWith(String productnumber) {
+        httpRequest = RestAssured.given();
+
+        requestParams.put("title","Test title product");
+        requestParams.put("price", "36.6");
+        requestParams.put("description","sky blue all star");
+        requestParams.put("image","https://conlog.co.za");
+        requestParams.put("category","electronic");
+
+        httpRequest.body(requestParams.toJSONString());
+        response = httpRequest.put("products/"+ productnumber);
+        ResponseBody body = response.getBody();
+        JsonPath path = response.jsonPath();
+
+        System.out.println(response.getStatusLine());
+        System.out.println(body.asString());
+
+    }
 }
