@@ -101,7 +101,7 @@ public class Products {
     }
 
     @When("I pass the url of products in the request with {}")
-    public void iPassTheUrlOfProductsInTheRequestWith(String productnumber) {
+    public void iPassTheUrlOfProductsInTheRequestWith(String productNumber) {
         httpRequest = RestAssured.given();
 
         requestParams.put("title","Test title product");
@@ -111,12 +111,29 @@ public class Products {
         requestParams.put("category","electronic");
 
         httpRequest.body(requestParams.toJSONString());
-        response = httpRequest.put("products/"+ productnumber);
+        response = httpRequest.put("products/"+ productNumber);
         ResponseBody body = response.getBody();
         JsonPath path = response.jsonPath();
 
         System.out.println(response.getStatusLine());
         System.out.println(body.asString());
 
+    }
+    @Given("I hit the url of delete product api endpoint")
+    public void i_hit_the_url_of_delete_product_api_endpoint() {
+        RestAssured.baseURI = "https://fakestoreapi.com/";
+        requestParams = new JSONObject();
+    }
+    @When("I pass the url of delete products in the request with {int}")
+    public void i_pass_the_url_of_delete_products_in_the_request_with(Integer productNumber) {
+        httpRequest = RestAssured.given();
+
+        httpRequest.body(requestParams.toJSONString());
+        response = httpRequest.delete("products/"+ productNumber);
+        ResponseBody body = response.getBody();
+        JsonPath path = response.jsonPath();
+
+        System.out.println(response.getStatusLine());
+        System.out.println(body.asString());
     }
 }
